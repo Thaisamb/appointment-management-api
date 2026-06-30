@@ -9,8 +9,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Options;
 using AppointmentManagement.Application.Configurations;
+using AppointmentManagement.Application.Exceptions;
+using AppointmentManagement.Domain.ValueObjects;
 
-namespace AppointmentManagement.Application.Services.Auth;
+namespace AppointmentManagement.Infrastructure.Services;
 
 public class AuthService
 {
@@ -26,6 +28,7 @@ public class AuthService
     public async Task<string> Register(RegisterDto dto)
     {
         await EnsureEmailIsUnique(dto.Email);
+        await EnsureDocumentsAreUnique(dto.CPF, dto.CNPJ);
 
         var user = new User
         {
@@ -34,7 +37,16 @@ public class AuthService
             CPF = dto.CPF,
             CNPJ = dto.CNPJ,
             CompanyName = dto.CompanyName,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password)
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+            Address = dto.Address is null ? null : new Address(
+           dto.Address.Street,
+           dto.Address.District,
+           dto.Address.City,
+           dto.Address.State,
+           dto.Address.ZipCode,
+           dto.Address.Number,
+           dto.Address.Complement
+       )
         };
 
         _context.Users.Add(user);
@@ -86,6 +98,19 @@ public class AuthService
         if (exists)
             throw new InvalidOperationException("Email já cadastrado");
     }
+
+    private async Task EnsureDocumentsAreUnique(string? cpf, string? cnpj)
+    {
+        if (string.IsNullOrEmpty(cpf) && string.IsNullOrEmpty(cnpj)) return;
+
+        var exists = await _context.Users.AnyAsync(u =>
+            (!string.IsNullOrEmpty(cpf) && u.CPF == cpf) ||
+            (!string.IsNullOrEmpty(cnpj) && u.CNPJ == cnpj));
+
+        if (exists)
+            throw new ValidationException("O CPF ou CNPJ informado já está cadastrado.");
+    }
+
 
     private bool IsValidPassword(string password, string hash)
     {

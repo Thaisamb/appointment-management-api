@@ -1,4 +1,4 @@
-using AppointmentManagement.Application.DTOs.Shared;
+using AppointmentManagement.Application.DTOs.ValueObjects;
 
 namespace AppointmentManagement.Application.DTOs.Auth;
 
@@ -12,6 +12,6 @@ public class RegisterDto
     public string? CNPJ { get; set; }
     public string? CompanyName { get; set; }
 
-    public AddressDto Address { get; set; }
+    public AddressDto? Address { get; set; }
 
 }

@@ -1,22 +1,38 @@
-using AppointmentManagement.Application.Services.Auth;
+using System.Text;
 using AppointmentManagement.Application.Configurations;
+using AppointmentManagement.Application.DTOs.Session;
+using AppointmentManagement.Application.Interfaces;
+using AppointmentManagement.Application.Interfaces.Repositories;
+using AppointmentManagement.Application.Interfaces.Services;
+using AppointmentManagement.Application.Validators.Session;
+using AppointmentManagement.Infrastructure;
 using AppointmentManagement.Infrastructure.Data;
+using AppointmentManagement.Infrastructure.Repositories;
+using AppointmentManagement.Infrastructure.Services;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
-
-// DbContext
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Dev", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// JWT Config
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
-// Auth
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -33,13 +49,37 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddAuthorization();
 builder.Services.AddControllers();
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddFluentValidationAutoValidation();
+
+// Validators
+builder.Services.AddScoped<IValidator<CreateSessionDto>, CreateSessionValidator>();
+builder.Services.AddScoped<IValidator<UpdateSessionDto>, UpdateSessionValidator>();
+builder.Services.AddScoped<IValidator<UpdateSessionGroupDto>, UpdateSessionGroupValidator>();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+// Services — todos no Infrastructure agora
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<IEncryptionService, EncryptionService>();
+builder.Services.AddScoped<IInvoiceIssuanceService, InvoiceIssuanceService>();
+builder.Services.AddScoped<IInvoiceIssuanceRepository, InvoiceIssuanceRepository>();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+builder.Services.AddHttpClient<ICepService, CepService>();
+builder.Services.AddHttpClient<IFocusNFeService, FocusNFeService>();
+builder.Services.Configure<FocusNFeSettings>(
+    builder.Configuration.GetSection("FocusNFe"));
+// Repositories
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new() { Title = "Appointment API", Version = "v1" });
-
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -49,7 +89,6 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Bearer {seu_token}"
     });
-
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -58,14 +97,13 @@ builder.Services.AddSwaggerGen(options =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Id   = "Bearer"
                 }
             },
             Array.Empty<string>()
         }
     });
 });
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -73,7 +111,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("Dev");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

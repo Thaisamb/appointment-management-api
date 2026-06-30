@@ -17,7 +17,7 @@ namespace AppointmentManagement.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.7")
+                .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -30,8 +30,201 @@ namespace AppointmentManagement.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("BirthDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("CPF")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("character varying(11)");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("FinancialResponsibleId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("InvoiceIssuerId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<decimal>("PricePerSession")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdateAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FinancialResponsibleId");
+
+                    b.HasIndex("InvoiceIssuerId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Clients");
+                });
+
+            modelBuilder.Entity("AppointmentManagement.Domain.Entities.FinancialResponsible", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CPF")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FinancialResponsibles");
+                });
+
+            modelBuilder.Entity("AppointmentManagement.Domain.Entities.Invoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<string>("InvoiceNumber")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("IssuedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PdfUrl")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("XmlUrl")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Invoices");
+                });
+
+            modelBuilder.Entity("AppointmentManagement.Domain.Entities.InvoiceIssuance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CNPJ")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CertificateExpiry")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("CertificatePasswordEncrypted")
+                        .HasColumnType("text");
+
+                    b.Property<string>("CertificatePath")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("FocusNFeCompanyId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("GovBrLogin")
+                        .HasColumnType("text");
+
+                    b.Property<string>("GovBrPasswordEncrypted")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsMei")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsRegisteredOnFocusNFe")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("IssuerType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("MunicipalRegistration")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ServiceCode")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("InvoiceIssuances");
+                });
+
+            modelBuilder.Entity("AppointmentManagement.Domain.Entities.InvoiceIssuer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CPF")
                         .IsRequired()
@@ -45,24 +238,9 @@ namespace AppointmentManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Notes")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("PricePerSession")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Client");
+                    b.ToTable("InvoiceIssuers");
                 });
 
             modelBuilder.Entity("AppointmentManagement.Domain.Entities.Session", b =>
@@ -76,20 +254,29 @@ namespace AppointmentManagement.Infrastructure.Migrations
                     b.Property<int>("ClientId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("Duration")
                         .HasColumnType("integer");
 
-                    b.Property<string>("InvoiceNumber")
-                        .HasColumnType("text");
+                    b.Property<int?>("InvoiceId")
+                        .HasColumnType("integer");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal>("PricePerSession")
                         .HasColumnType("numeric");
+
+                    b.Property<Guid?>("RepetitionGroupId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
@@ -98,9 +285,11 @@ namespace AppointmentManagement.Infrastructure.Migrations
 
                     b.HasIndex("ClientId");
 
+                    b.HasIndex("InvoiceId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("Session");
+                    b.ToTable("Sessions");
                 });
 
             modelBuilder.Entity("AppointmentManagement.Domain.Entities.User", b =>
@@ -125,6 +314,15 @@ namespace AppointmentManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("InvoicesEmitted")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("InvoicesFreeQuota")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("MunicipalRegistration")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -133,6 +331,12 @@ namespace AppointmentManagement.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("ServiceCode")
+                        .HasColumnType("text");
+
+                    b.Property<int>("TypeInvoiceIssuer")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
@@ -140,44 +344,23 @@ namespace AppointmentManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("AppointmentManagement.Domain.Entities.Client", b =>
                 {
+                    b.HasOne("AppointmentManagement.Domain.Entities.FinancialResponsible", "FinancialResponsible")
+                        .WithMany()
+                        .HasForeignKey("FinancialResponsibleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AppointmentManagement.Domain.Entities.InvoiceIssuer", "InvoiceIssuer")
+                        .WithMany()
+                        .HasForeignKey("InvoiceIssuerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("AppointmentManagement.Domain.Entities.User", "User")
                         .WithMany("Clients")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.OwnsOne("AppointmentManagement.Domain.ValueObjects.Address", "Address", b1 =>
-                        {
-                            b1.Property<int>("ClientId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("City")
-                                .HasColumnType("text")
-                                .HasColumnName("City");
-
-                            b1.Property<string>("District")
-                                .HasColumnType("text")
-                                .HasColumnName("District");
-
-                            b1.Property<string>("State")
-                                .HasColumnType("text")
-                                .HasColumnName("State");
-
-                            b1.Property<string>("Street")
-                                .HasColumnType("text")
-                                .HasColumnName("Street");
-
-                            b1.Property<string>("ZipCode")
-                                .HasColumnType("text")
-                                .HasColumnName("ZipCode");
-
-                            b1.HasKey("ClientId");
-
-                            b1.ToTable("Client");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ClientId");
-                        });
 
                     b.OwnsMany("AppointmentManagement.Domain.ValueObjects.EmergencyContact", "EmergencyContacts", b1 =>
                         {
@@ -191,13 +374,16 @@ namespace AppointmentManagement.Infrastructure.Migrations
                                 .HasColumnType("integer");
 
                             b1.Property<string>("Name")
-                                .HasColumnType("text");
+                                .HasMaxLength(150)
+                                .HasColumnType("character varying(150)");
 
                             b1.Property<string>("Phone")
-                                .HasColumnType("text");
+                                .HasMaxLength(20)
+                                .HasColumnType("character varying(20)");
 
-                            b1.Property<string>("Relation")
-                                .HasColumnType("text");
+                            b1.Property<string>("Relationship")
+                                .HasMaxLength(50)
+                                .HasColumnType("character varying(50)");
 
                             b1.HasKey("Id");
 
@@ -209,11 +395,90 @@ namespace AppointmentManagement.Infrastructure.Migrations
                                 .HasForeignKey("ClientId");
                         });
 
-                    b.Navigation("Address");
-
                     b.Navigation("EmergencyContacts");
 
+                    b.Navigation("FinancialResponsible");
+
+                    b.Navigation("InvoiceIssuer");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AppointmentManagement.Domain.Entities.Invoice", b =>
+                {
+                    b.HasOne("AppointmentManagement.Domain.Entities.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AppointmentManagement.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AppointmentManagement.Domain.Entities.InvoiceIssuance", b =>
+                {
+                    b.HasOne("AppointmentManagement.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AppointmentManagement.Domain.Entities.InvoiceIssuer", b =>
+                {
+                    b.OwnsOne("AppointmentManagement.Domain.ValueObjects.Address", "Address", b1 =>
+                        {
+                            b1.Property<int>("InvoiceIssuerId")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("City")
+                                .HasColumnType("text")
+                                .HasColumnName("City");
+
+                            b1.Property<string>("Complement")
+                                .HasColumnType("text")
+                                .HasColumnName("Complement");
+
+                            b1.Property<string>("District")
+                                .HasColumnType("text")
+                                .HasColumnName("District");
+
+                            b1.Property<string>("Number")
+                                .HasColumnType("text")
+                                .HasColumnName("Number");
+
+                            b1.Property<string>("State")
+                                .HasColumnType("text")
+                                .HasColumnName("State");
+
+                            b1.Property<string>("Street")
+                                .HasColumnType("text")
+                                .HasColumnName("Street");
+
+                            b1.Property<string>("ZipCode")
+                                .HasColumnType("text")
+                                .HasColumnName("ZipCode");
+
+                            b1.HasKey("InvoiceIssuerId");
+
+                            b1.ToTable("InvoiceIssuers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("InvoiceIssuerId");
+                        });
+
+                    b.Navigation("Address")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AppointmentManagement.Domain.Entities.Session", b =>
@@ -224,6 +489,10 @@ namespace AppointmentManagement.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AppointmentManagement.Domain.Entities.Invoice", "Invoice")
+                        .WithMany("Sessions")
+                        .HasForeignKey("InvoiceId");
+
                     b.HasOne("AppointmentManagement.Domain.Entities.User", "User")
                         .WithMany("Sessions")
                         .HasForeignKey("UserId")
@@ -231,6 +500,8 @@ namespace AppointmentManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Client");
+
+                    b.Navigation("Invoice");
 
                     b.Navigation("User");
                 });
@@ -246,9 +517,15 @@ namespace AppointmentManagement.Infrastructure.Migrations
                                 .HasColumnType("text")
                                 .HasColumnName("City");
 
+                            b1.Property<string>("Complement")
+                                .HasColumnType("text");
+
                             b1.Property<string>("District")
                                 .HasColumnType("text")
                                 .HasColumnName("District");
+
+                            b1.Property<string>("Number")
+                                .HasColumnType("text");
 
                             b1.Property<string>("State")
                                 .HasColumnType("text")
@@ -270,11 +547,15 @@ namespace AppointmentManagement.Infrastructure.Migrations
                                 .HasForeignKey("UserId");
                         });
 
-                    b.Navigation("Address")
-                        .IsRequired();
+                    b.Navigation("Address");
                 });
 
             modelBuilder.Entity("AppointmentManagement.Domain.Entities.Client", b =>
+                {
+                    b.Navigation("Sessions");
+                });
+
+            modelBuilder.Entity("AppointmentManagement.Domain.Entities.Invoice", b =>
                 {
                     b.Navigation("Sessions");
                 });

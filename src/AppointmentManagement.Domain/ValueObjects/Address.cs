@@ -5,5 +5,7 @@ public record Address(
     string? District,
     string? City,
     string? State,
-    string? ZipCode
+    string? ZipCode,
+    string? Number,
+    string? Complement
 );

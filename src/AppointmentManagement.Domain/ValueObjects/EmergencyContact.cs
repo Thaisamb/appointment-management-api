@@ -2,6 +2,6 @@ namespace AppointmentManagement.Domain.ValueObjects;
 
 public record EmergencyContact(
     string? Name,
-    string? Relation,
+    string? Relationship,
     string? Phone
 );

@@ -1,5 +1,8 @@
-namespace AppointmentManagement.Domain.Entities;
 using AppointmentManagement.Domain.ValueObjects;
+using AppointmentManagement.Domain.Enums;
+
+namespace AppointmentManagement.Domain.Entities;
+
 
 public class User
 {
@@ -12,11 +15,19 @@ public class User
     // 👤 dados pessoais
     public required string Name { get; set; }
     public required string CPF { get; set; }
-    public Address Address { get; set; }
+    public Address? Address { get; set; }
+
 
     // 🏢 opcional (empresa)
     public string? CNPJ { get; set; }
     public string? CompanyName { get; set; }
+
+    // nota fiscal
+    public string? MunicipalRegistration { get; set; }
+    public string? ServiceCode { get; set; }      // item lista serviço ex: "14.01"
+    public TypeInvoiceIssuer TypeInvoiceIssuer { get; set; } = TypeInvoiceIssuer.CPF;
+    public int InvoicesEmitted { get; set; } = 0;      // total emitido
+    public int InvoicesFreeQuota { get; set; } = 100;   // cota gratuita
 
     // 📊 relacionamento
     public ICollection<Client> Clients { get; set; } = new List<Client>();

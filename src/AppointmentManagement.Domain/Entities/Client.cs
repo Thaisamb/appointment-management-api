@@ -1,24 +1,30 @@
-namespace AppointmentManagement.Domain.Entities;
 using AppointmentManagement.Domain.ValueObjects;
+
+namespace AppointmentManagement.Domain.Entities;
 
 public class Client
 {
     public int Id { get; set; }
+
     public int UserId { get; set; }
-    public required User User { get; set; }
+    public int FinancialResponsibleId { get; set; }
+    public int InvoiceIssuerId { get; set; }
+    
     public required string Name { get; set; }
     public required string Phone { get; set; }
-    public required string Email { get; set; }
     public required string CPF { get; set; }
-
-    public DateTime? BirthDate { get; set; }
-
     public required decimal PricePerSession { get; set; }
-
-    public Address? Address { get; set; }
-    public ICollection<EmergencyContact>? EmergencyContacts { get; set; } = new List<EmergencyContact>();
-
+    public required DateTime BirthDate { get; set; }
+    public required DateTime CreateAt { get; set; }
+    public DateTime? UpdateAt { get; set; }
     public string? Notes { get; set; }
+    
 
-    public ICollection<Session> Sessions { get; set; } = new List<Session>();
+    public virtual User User { get; set; } = null!;
+    public virtual FinancialResponsible FinancialResponsible { get; set; } = null!;
+    public virtual InvoiceIssuer InvoiceIssuer { get; set; } = null!;
+
+    public ICollection<EmergencyContact> EmergencyContacts { get; set; } = new List<EmergencyContact>();
+
+    public virtual ICollection<Session> Sessions { get; set; } = new List<Session>();
 }

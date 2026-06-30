@@ -7,8 +7,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.7" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		  <PrivateAssets>all</PrivateAssets>
 		</PackageReference>
@@ -18,6 +19,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\AppointmentManagement.Application\AppointmentManagement.Application.csproj" />
+		<ProjectReference Include="..\AppointmentManagement.Infrastructure\AppointmentManagement.Infrastructure.csproj" />
 	</ItemGroup>
 
 </Project>
